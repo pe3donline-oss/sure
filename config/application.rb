@@ -34,6 +34,12 @@ module Sure
     # TODO: This is here for incremental adoption of localization.  This can be removed when all translations are implemented.
     config.i18n.fallbacks = true
 
+    # SURE_LOCALES=en,pt-BR keeps only those languages' translations in memory
+    # (all of them are loaded by default). Include the default locale, "en".
+    if ENV["SURE_LOCALES"].present?
+      config.i18n.available_locales = ENV["SURE_LOCALES"].split(",").map(&:strip).reject(&:empty?).map(&:to_sym)
+    end
+
     config.app_mode = (ENV["SELF_HOSTED"] == "true" || ENV["SELF_HOSTING_ENABLED"] == "true" ? "self_hosted" : "managed").inquiry
 
     # Self hosters can optionally set their own encryption keys if they want to use ActiveRecord encryption.
