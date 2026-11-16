@@ -16,8 +16,14 @@ module SelfHostable
       self_hosted? && User.count.zero?
     end
 
+    # Redis is only a hard requirement while Sidekiq runs the jobs. With
+    # JOB_QUEUE_ADAPTER=async (and CABLE_ADAPTER=async) the app runs without it.
+    def sidekiq_in_use?
+      Rails.application.config.active_job.queue_adapter.to_s == "sidekiq"
+    end
+
     def verify_self_host_config
-      return unless self_hosted?
+      return unless self_hosted? && sidekiq_in_use?
 
       # Special handling for Redis configuration error page
       if controller_name == "pages" && action_name == "redis_configuration_error"
