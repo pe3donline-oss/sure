@@ -78,7 +78,7 @@ Rails.application.configure do
   # model call; enough overlapping jobs exhausted the pool and surfaced as
   # ActiveRecord::ConnectionTimeoutError on an unrelated controller, because
   # RulesController#index runs an ActiveRecord lookup in a before_action.
-  config.active_job.queue_adapter = :sidekiq
+  config.active_job.queue_adapter = ENV.fetch("JOB_QUEUE_ADAPTER", "sidekiq").to_sym
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true

@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include OnAccessScheduling
   include RestoreLayoutPreferences, Onboardable, Localize, AutoSync, Authentication, Invitable,
           SelfHostable, StoreLocation, Impersonatable, Breadcrumbable,
           FeatureGuardable, Notifiable, SafePagination, AccountAuthorizable,
@@ -148,7 +149,8 @@ class ApplicationController < ActionController::Base
     # banner already gates on `Current.user&.super_admin?` and `present?`.
     def current_sidekiq_health
       return @current_sidekiq_health if defined?(@current_sidekiq_health)
-      @current_sidekiq_health = Rails.application.config.app_mode.self_hosted? ? SidekiqHealth.current : nil
+      sidekiq_in_use = Rails.application.config.active_job.queue_adapter.to_s == "sidekiq"
+      @current_sidekiq_health = Rails.application.config.app_mode.self_hosted? && sidekiq_in_use ? SidekiqHealth.current : nil
     end
 
     def accessible_accounts

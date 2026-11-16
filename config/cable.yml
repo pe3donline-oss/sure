@@ -5,6 +5,7 @@ test:
   adapter: test
 
 production:
-  adapter: redis
+  # CABLE_ADAPTER=async keeps broadcasts inside one process (single container, no Redis).
+  adapter: <%= ENV.fetch("CABLE_ADAPTER", "redis") %>
   url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
   channel_prefix: sure_production
