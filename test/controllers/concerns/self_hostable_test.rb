@@ -29,6 +29,15 @@ class SelfHostableTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "does not require redis when the jobs run in the web process" do
+    ApplicationController.any_instance.stubs(:sidekiq_in_use?).returns(false)
+
+    with_self_hosting(redis_connected: false) do
+      get privacy_path
+      assert_response :success
+    end
+  end
+
   test "redirects home from the error page once redis becomes reachable" do
     with_self_hosting(redis_connected: true) do
       get redis_configuration_error_path
